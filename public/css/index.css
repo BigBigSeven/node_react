@@ -1,0 +1,8 @@
+#root {
+    height: 100%;
+}
+#login-page {
+    height: 100%;
+    background-image: url(/img/bg.png);
+    background-size: 100% 100%;
+}
