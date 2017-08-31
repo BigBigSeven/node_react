@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper'
 import TextField from 'material-ui/TextField'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import { browserHistory } from 'react-router'
 
 import getJSON from './getJSON'
@@ -13,7 +14,9 @@ export default class Login extends Component {
 		super(props);
 		this.state = {
 			username: '',
-			password: ''
+			password: '',
+			empty: false,
+			unauthenticated: false
 		}
 	}
 	componentDidMount() {
@@ -21,17 +24,20 @@ export default class Login extends Component {
 	}
 	checkLogin() {
 		let username = this.state.username, password = this.state.password;
+		let that = this;
 		if(!!username && !!password) {
 			getJSON(authUrl, {username: username, password: password}).then(function(json) {
-				console.log(json);
 				window.sessionStorage.setItem('token', json.token);  //用于保存登录状态
 				browserHistory.push('/');
 		  }, function(err) {
-		  	console.log(err);
+		  	that.setState({unauthenticated: true})
 		  });
 		} else {
-				console.log('不能为空！');
+			this.setState({empty: true})
 		}
+	}
+	handleActionTouchTap() {
+
 	}
 	render() {
 		return (
@@ -72,23 +78,32 @@ export default class Login extends Component {
               color = "#29b6f6"
             /><br />
             <RaisedButton label="LOGIN" primary={true} style={{marginTop: '20px', width: '300px'}}
-							onClick = {() => {this.checkLogin()}}
-            />
+							onClick = {this.checkLogin.bind(this)}
+            />		
           </form>
 				</Paper>
+				<Snackbar
+          open={this.state.empty}
+          message="Username Or Password Is Empty!"
+          contentStyle = {{width:'100%', textAlign:'center'}}
+          autoHideDuration={4000}
+          onRequestClose={() => {this.setState({empty: false})}}
+        />
+        <Snackbar
+          open={this.state.unauthenticated}
+          message= "Unauthenticate Failed"
+          action="Lost Password?"
+          contentStyle = {{width:'100%', textAlign:'center'}}
+          autoHideDuration={4000}
+          onRequestClose={() => {this.setState({unauthenticated: false})}}
+          onActionTouchTap={this.handleActionTouchTap}
+        />
 			</div>
 		)           
 	}
 }
 
-const overlay = {
-		position:  'absolute',
-		opacity: '0.6',
-		width: '100%',
-		height: '100%',
-		backgroundColor: '#1c2b36',
-},
-paper = {
+const paper = {
 		width: '500px',
 		height: '400px',
 		position:  'absolute',
