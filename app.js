@@ -8,7 +8,7 @@ var passport = require('passport');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
 var passportconfig = require('./passportconfig');
-var D = require('../defaultset');
+var D = require('./defaultset');
 var app = express();
 passportconfig();
 app.set('superSecret', D.secret);
@@ -49,17 +49,20 @@ app.post('/authenticate', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
         if (err) return next(err);
         if (!user) {
-            return res.json({ success: false, message: null });
+            return res.status(401).json({ success: false, message: 'unauthenticated' });
         }
         var token = jwt.sign({ name: user.username, password: user.password }, D.secret, {
             expiresIn: 86400 // expires in 24 hours
         });
         req.login(user, function(err) {
             if (err) return next(err);
-            res.cookie("asdoilnihon%jkhkjh%kto", token, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true });
+            res.cookie("asdoilnihon%jkhkjh%kt1", token, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }); //向cookie存入一个token
+            res.cookie("asdoilnihon%jkhkjh%kt2", req.user.username, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }); //用户名存入cookie
+            res.cookie("asdoilnihon%jkhkjh%kt3", req.user.id, { maxAge: 1000 * 60 * 60 * 24, httpOnly: true }); ////用户id
             res.json({
                 success: true,
-                message: { userInfo: { username: req.user.username, id: req.user.id } }
+                message: 'authenticated',
+                token: token
             });
         });
     })(req, res, next);

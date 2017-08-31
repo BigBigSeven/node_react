@@ -3,8 +3,9 @@ import Paper from 'material-ui/Paper'
 import TextField from 'material-ui/TextField'
 import FontIcon from 'material-ui/FontIcon'
 import RaisedButton from 'material-ui/RaisedButton';
+import { browserHistory } from 'react-router'
 
-import getJSON from '../getJSON'
+import getJSON from './getJSON'
 
 const authUrl = '/authenticate';
 export default class Login extends Component {
@@ -23,6 +24,8 @@ export default class Login extends Component {
 		if(!!username && !!password) {
 			getJSON(authUrl, {username: username, password: password}).then(function(json) {
 				console.log(json);
+				window.sessionStorage.setItem('token', json.token);  //用于保存登录状态
+				browserHistory.push('/');
 		  }, function(err) {
 		  	console.log(err);
 		  });

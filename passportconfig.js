@@ -18,7 +18,6 @@ module.exports = function() {
   /*  身份验证策略  */
   passport.use('local', new LocalStrategy({ usernameField: 'username' },
     function(username, password, done) {
-      console.log(username);
       if (!username) {
         return done(err);
       }
